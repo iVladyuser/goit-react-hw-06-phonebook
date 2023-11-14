@@ -1,19 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect} from 'react';
 import { nanoid } from 'nanoid';
 
 import { ContactForm, ContactList, Filter } from 'components';
-
-const initialContacts = [
-  { id: 1, name: 'Silvia Weber', number: '0076 397–70–42' },
-  { id: 2, name: 'Alberto Meier', number: '0079 202-75-94' },
-];
+import { useDispatch, useSelector } from 'react-redux';
 
 const App = () => {
-  const [contacts, setContacts] = useState(() => {
-    const stringifiedContacts = localStorage.getItem('contacts');
-    const parsedContacts = JSON.parse(stringifiedContacts) ?? initialContacts;
-    return parsedContacts;
-  });
+  const dispatch = useDispatch();
+  const contacts = useSelector(state => state.contactsStore.contacts);
+  console.log('contacts: ', contacts);
+  // const [contacts, setContacts] = useState(() => {
+  //   const stringifiedContacts = localStorage.getItem('contacts');
+  //   const parsedContacts = JSON.parse(stringifiedContacts) ?? initialContacts;
+  //   return parsedContacts;
+  // });
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
@@ -21,7 +20,12 @@ const App = () => {
   }, [contacts]);
 
   const deleteContact = contactId => {
-    setContacts(contacts.filter(contact => contact.id !== contactId));
+    const deleteContactAction = {
+      type: 'contacts/deleteContact',
+      payload: contactId,
+    };
+    dispatch(deleteContactAction);
+    // setContacts(contacts.filter(contact => contact.id !== contactId));
   };
 
   const handleAddContact = newContact => {
@@ -38,7 +42,13 @@ const App = () => {
       id: nanoid(),
     };
 
-      setContacts([...contacts, readyToAddContact])
+    const addContactAction = {
+      type: 'contacts/addContact',
+      payload: readyToAddContact,
+    };
+    dispatch(addContactAction);
+
+    // setContacts([...contacts, readyToAddContact])
   };
 
   const changeFilter = value => {
