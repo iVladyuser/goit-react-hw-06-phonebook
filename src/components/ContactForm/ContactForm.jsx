@@ -1,9 +1,37 @@
 import React, { useState } from 'react';
+import { nanoid } from 'nanoid';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from 'redux/contacts/phoneBookSlice';
 import { FormInput, Form, FormButton, FormLabel } from './ContactForm.styled';
 
-const ContactForm = ({ onSubmit }) => {
+const ContactForm = () => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+
+  const dispatch = useDispatch();
+  const contacts = useSelector(state => state.contactsStore.contacts);
+
+  const onSubmitAddContact = e => {
+    e.preventDefault();
+    const data = {
+      name,
+      number: Number.parseFloat(number) || alert(`Number is not correct`),
+    };
+    const newContact = { ...data, id: nanoid() };
+
+    const isExist = contacts.some(
+      ({ name }) => name.toLowerCase() === newContact.name.toLowerCase()
+    );
+
+    if (isExist) {
+      alert(`Oops, contact '${newContact.name}' is already in contacts!`);
+      return;
+    }
+
+    dispatch(addContact(newContact));
+    setName('');
+    setNumber('');
+  };
 
   const handleInputChange = e => {
     const { name, value } = e.currentTarget;
@@ -20,19 +48,8 @@ const ContactForm = ({ onSubmit }) => {
     }
   };
 
-  const handleSubmit = e => {
-    e.preventDefault();
-    const contactSchema = {
-      name,
-      number: Number.parseFloat(number) || alert(`Number is not correct`),
-    };
-    onSubmit(contactSchema);
-    setName('');
-    setNumber('');
-  };
-
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form onSubmit={onSubmitAddContact}>
       <FormLabel htmlFor="name">Name</FormLabel>
       <FormInput
         type="text"
