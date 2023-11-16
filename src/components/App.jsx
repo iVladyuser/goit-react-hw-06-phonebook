@@ -1,31 +1,23 @@
-import { useState, useEffect} from 'react';
+import { useEffect } from 'react';
 import { nanoid } from 'nanoid';
 
 import { ContactForm, ContactList, Filter } from 'components';
 import { useDispatch, useSelector } from 'react-redux';
+import { addContact, deleteContact } from 'redux/contacts/phoneBookSlice';
+import { filterContact } from 'redux/contacts/filterSlice';
 
 const App = () => {
   const dispatch = useDispatch();
   const contacts = useSelector(state => state.contactsStore.contacts);
-  console.log('contacts: ', contacts);
-  // const [contacts, setContacts] = useState(() => {
-  //   const stringifiedContacts = localStorage.getItem('contacts');
-  //   const parsedContacts = JSON.parse(stringifiedContacts) ?? initialContacts;
-  //   return parsedContacts;
-  // });
-  const [filter, setFilter] = useState('');
+
+  const filter = useSelector(state => state.filterStore);
 
   useEffect(() => {
     localStorage.setItem('contacts', JSON.stringify(contacts));
   }, [contacts]);
 
-  const deleteContact = contactId => {
-    const deleteContactAction = {
-      type: 'contacts/deleteContact',
-      payload: contactId,
-    };
-    dispatch(deleteContactAction);
-    // setContacts(contacts.filter(contact => contact.id !== contactId));
+  const handleDeleteContact = contactId => {
+    dispatch(deleteContact(contactId));
   };
 
   const handleAddContact = newContact => {
@@ -42,17 +34,15 @@ const App = () => {
       id: nanoid(),
     };
 
-    const addContactAction = {
-      type: 'contacts/addContact',
-      payload: readyToAddContact,
-    };
-    dispatch(addContactAction);
-
-    // setContacts([...contacts, readyToAddContact])
+    // const addContactAction = {
+    //   type: 'contacts/addContact',
+    //   payload: readyToAddContact,
+    // };
+    dispatch(addContact(readyToAddContact));
   };
 
   const changeFilter = value => {
-    setFilter(value);
+    dispatch(filterContact(value));
   };
 
   const getFilteredContacts = () => {
@@ -78,7 +68,7 @@ const App = () => {
       <Filter value={filter} onChange={changeFilter} />
       <ContactList
         contacts={getFilteredContacts()}
-        onDeleteContact={deleteContact}
+        onDeleteContact={handleDeleteContact}
       />
     </div>
   );
