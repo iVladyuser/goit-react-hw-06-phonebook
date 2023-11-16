@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { nanoid } from 'nanoid';
 
 import { ContactForm, ContactList, Filter } from 'components';
@@ -11,10 +10,6 @@ const App = () => {
   const contacts = useSelector(state => state.contactsStore.contacts);
 
   const filter = useSelector(state => state.filterStore);
-
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
 
   const handleDeleteContact = contactId => {
     dispatch(deleteContact(contactId));
